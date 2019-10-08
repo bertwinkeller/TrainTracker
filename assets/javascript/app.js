@@ -36,6 +36,33 @@ var Config = {
       destination: destination,
       firstTrain: firstTrain,
       frequency: frequency
-  },{merge: true});
+  });
+document.getElementById('form').reset();
+
  
 })};
+
+
+db.getReference().on("child_added", function(childSnapshot){
+
+    let minutesAway;
+
+// time between current and first train
+    let diffTime = moment().diff(moment(firstTrain), "minutes");
+    let remainder = diffTime % childSnapshot.val().frequency;
+
+// minutes until next train
+     minutesAway = childSnapshot.val().frequency - remainder;
+// next train time
+    let nextTrain = moment().add(minutesAway, "minutes");
+    nextTrain = moment(nextTrain).format("hh:mm");
+
+
+document.getElementById('add-row').append("<tr><td>" + childSnapshot.val().name +
+"<tr><td>" + childSnapshot.val().destination +
+"<tr><td>" + childSnapshot.val().frequency +
+"<tr><td>" + nextTrain +
+"<tr><td>" + minutesAway + "</td></tr>"); 
+
+
+});
