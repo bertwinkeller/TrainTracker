@@ -11,9 +11,9 @@ var Config = {
   // Initialize Firebase
   firebase.initializeApp(Config);
   
-  const db = firebase.database();
+  const db = firebase.firestore();
 
-
+// setting variables 
   let name;
   let destination;
   let firstTrain;
@@ -23,10 +23,19 @@ var Config = {
   if(addTrain){
       addEventListener('click', function (){
    event.preventDefault();
+// storing new train data
    name = document.getElementById('train-name').value;
    destination = document.getElementById('destination').value;
    firstTrain = document.getElementById('first-train').value;
    frequency = document.getElementById('frequency').value;
-   console.log(name,destination,firstTrain,frequency)
+   
       
-  })};
+// store in firebase
+  db.collection('trains').doc('info').set({
+      name: name,
+      destination: destination,
+      firstTrain: firstTrain,
+      frequency: frequency
+  });
+  document.getElementById('form').reset();
+})};
