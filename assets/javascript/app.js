@@ -31,11 +31,11 @@ var Config = {
    
       
 // store in firebase
-  db.collection('trains').doc('info').set({
+  db.collection('trains').doc(`${name}`).set({
       name: name,
       destination: destination,
       firstTrain: firstTrain,
       frequency: frequency
-  });
-  document.getElementById('form').reset();
+  },{merge: true});
+ 
 })};
