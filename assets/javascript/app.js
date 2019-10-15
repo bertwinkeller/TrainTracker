@@ -12,22 +12,23 @@ var Config = {
   firebase.initializeApp(Config);
   
   const db = firebase.firestore();
-
+  
 // setting variables 
   let name;
   let destination;
   let firstTrain;
   let frequency;
 
-  let addTrain = document.getElementById('addTrain');
-  if(addTrain){
-      addEventListener('click', function (){
+  
+  
+   
+     document.getElementById('addTrain').addEventListener('click', function (){
    event.preventDefault();
 // storing new train data
    name = document.getElementById('train-name').value;
    destination = document.getElementById('destination').value;
    firstTrain = document.getElementById('first-train').value;
-   frequency = document.getElementById('frequency').value;
+   frequency = parseInt(document.getElementById('frequency').value);
    
       
 // store in firebase
@@ -37,32 +38,56 @@ var Config = {
       firstTrain: firstTrain,
       frequency: frequency
   });
-document.getElementById('form').reset();
-
- 
-})};
-
-
-db.getReference().on("child_added", function(childSnapshot){
-
-    let minutesAway;
-
-// time between current and first train
-    let diffTime = moment().diff(moment(firstTrain), "minutes");
-    let remainder = diffTime % childSnapshot.val().frequency;
-
-// minutes until next train
-     minutesAway = childSnapshot.val().frequency - remainder;
-// next train time
-    let nextTrain = moment().add(minutesAway, "minutes");
-    nextTrain = moment(nextTrain).format("hh:mm");
+console.log(name)
+console.log(destination)
+console.log(firstTrain)
+console.log(frequency)
+});
 
 
-document.getElementById('add-row').append("<tr><td>" + childSnapshot.val().name +
-"<tr><td>" + childSnapshot.val().destination +
-"<tr><td>" + childSnapshot.val().frequency +
-"<tr><td>" + nextTrain +
-"<tr><td>" + minutesAway + "</td></tr>"); 
 
+db.collection("trains").onSnapshot(snap => {
+  snap.docs.forEach(doc => {
+    let { name, destination, firstTrain, frequency } = doc.data();
 
+    console.log(
+      `Trains first time: ${firstTrain} and comes every ${frequency} minutes`
+    );
+
+    //Grab current time
+    let currentTime = moment().format("HH:mm");
+    console.log(`current time: ${currentTime}`);
+
+    //converts first train time
+    let timeConverted = moment(firstTrain, "hh:mm").subtract(1, "years");
+    console.log(`first train time converted`);
+
+    //Difference between now and unix of train time
+    let difference = moment().diff(moment(timeConverted), "minutes");
+    console.log(`Difference: ${difference}`);
+
+    //Time apart(remainder)
+    let remainder = difference % frequency;
+    console.log(`remainder is ${remainder}`);
+
+    //Calculates minutes remaining until next train
+    let minutes = frequency - remainder;
+    console.log(`Minutes until next: ${minutes}`);
+
+    //Add minutes to next train to current time
+    let nextArrival = moment()
+      .add(minutes, "m")
+      .format("HH:mm");
+    console.log(`Next train comes at ${nextArrival}`);
+
+    //Change HTML to reflect data
+   
+    let trainElem = document.createElement("tr");
+    trainElem.innerHTML = `<td>${name}</td>
+    <td>${destination}</td>
+    <td>${frequency}</td>
+    <td>${nextArrival}</td>
+    <td>${minutes}</td>`;
+    document.getElementById('add-row').append(trainElem);
+  });
 });
