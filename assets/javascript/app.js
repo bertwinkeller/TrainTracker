@@ -47,7 +47,10 @@ console.log(frequency)
 
 
 db.collection("trains").onSnapshot(snap => {
+  document.getElementById('add-row').innerHTML = '';
+
   snap.docs.forEach(doc => {
+
     let { name, destination, firstTrain, frequency } = doc.data();
 
     console.log(
@@ -83,11 +86,15 @@ db.collection("trains").onSnapshot(snap => {
     //Change HTML to reflect data
    
     let trainElem = document.createElement("tr");
-    trainElem.innerHTML = `<td>${name}</td>
-    <td>${destination}</td>
-    <td>${frequency}</td>
-    <td>${nextArrival}</td>
-    <td>${minutes}</td>`;
-    document.getElementById('add-row').append(trainElem);
+  trainElem.innerHTML = `<td>${name}</td>
+  <td>${destination}</td>
+  <td>${frequency}</td>
+  <td>${nextArrival}</td>
+  <td>${minutes}</td>`;
+  document.getElementById('add-row').append(trainElem);
+
+
   });
+
+
 });
